@@ -1,0 +1,65 @@
+
+1. `gmapping_params.yaml`: `gmapping` SLAM 알고리즘을 위한 매개변수를 포함하며, 맵 업데이트 간격, 입자 수, 레이저 모델의 매개변수 설정 등이 있을 수 있습니다.
+
+2. `karto_mapper_params.yaml`: Karto SLAM 패키지의 매개변수를 보유하며, 맵 해상도, 스캔 범위, 루프 클로저 매개변수 설정 등을 포함할 가능성이 높습니다.
+
+3. `turtlebot3_lds_2d.lua`: TurtleBot 3의 LDS(레이저 거리 센서)를 사용한 2D SLAM에 대한 매개변수를 지정하는 Cartographer SLAM 패키지의 Lua 설정 파일입니다.
+
+4. `turtlebot3_lds_2d_gazebo.lua`: TurtleBot 3을 Gazebo 시뮬레이션에서 사용하기 위해 특별히 맞춤 설정된 이전 Lua 파일과 유사합니다.
+
+5. `frontier_exploration.yaml`: 프론티어 탐색 패키지를 사용한 자율 탐색을 위한 매개변수를 포함하며, 탐색 경계 및 목표 달성 기준 등이 있습니다.
+
+이 파일들은 TurtleBot 3의 센서와 운영 환경에 효과적으로 작동하도록 SLAM 알고리즘 및 내비게이션 동작을 세밀하게 조정하는 데 필수적입니다.
+
+
+1. `gmapping_params.yaml`:
+   ```yaml
+   map_update_interval: 5.0
+   maxUrange: 10.0
+   maxRange: 12.0
+   particles: 100
+   ```
+   `gmapping`의 매개변수 파일에서 `map_update_interval`은 맵을 업데이트하는 시간 간격을 나타내며, `maxUrange`와 `maxRange`는 센서가 읽을 수 있는 최대 거리를 정의합니다. `particles`는 사용될 입자 필터의 입자 수를 지정합니다.
+
+2. `karto_mapper_params.yaml`:
+   ```yaml
+   minimum_travel_distance: 0.5
+   minimum_travel_heading: 0.25
+   scan_buffer_size: 70
+   ```
+   Karto SLAM 설정 파일에서 `minimum_travel_distance`와 `minimum_travel_heading`은 새로운 스캔을 처리하기 전 로봇이 이동해야 하는 최소 거리와 방향을 설정합니다. `scan_buffer_size`는 처리할 스캔의 버퍼 크기를 정의합니다.
+
+3. `turtlebot3_lds_2d.lua`:
+   ```lua
+   options = {
+     map_builder = {
+       map_type = "PROBABILITY_GRID",
+     },
+     sensor_bridge = {
+       horizontal_laser_min_range = 0.3,
+       horizontal_laser_max_range = 12,
+     },
+   }
+   ```
+   Cartographer 설정에서 `map_builder.map_type`은 맵의 유형을 정의하며, `sensor_bridge`는 LDS 센서의 최소 및 최대 범위를 설정합니다.
+
+4. `turtlebot3_lds_2d_gazebo.lua`:
+   ```lua
+   -- Gazebo specific settings
+   TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
+   ```
+   Gazebo를 위한 설정에서는 실시간 상호 상관 스캔 매칭을 활성화하여 더 나은 시뮬레이션 성능을 얻습니다.
+
+5. `frontier_exploration.yaml`:
+   ```yaml
+   explore_boundary:
+     -5.0, -5.0
+     5.0, -5.0
+     5.0, 5.0
+     -5.0, 5.0
+   potential_scale: 1e-3
+   gain_scale: 1.0
+   ```
+   프론티어 탐색 설정에서 `explore_boundary`는 탐색할 영역의 경계를 정의하고, `potential_scale`과 `gain_scale`은 탐색 알고리즘의 비용 계산에 영향을 줍니다.
+
+위 설정 파일들은 로봇이 환경을 효과적으로 매핑하고 탐색하는 데 사용되는 중요한 매개변수들을 포함하고 있습니다.

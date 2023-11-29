@@ -1,0 +1,189 @@
+global_costmap_params.yaml 파일에서 시작하여 중요한 매개변수를 예시와 함께 설명하겠습니다. 파일 내용을 살펴보죠.
+
+global_costmap_params.yaml에는 내비게이션 스택에서 사용하는 글로벌 비용지도에 대한 매개변수들이 들어 있습니다. 각 매개변수가 일반적으로 의미하는 것은 다음과 같습니다:
+
+global_frame: 비용지도가 참조로 삼는 좌표계로, 보통 맵과 일치하도록 map으로 설정됩니다.
+robot_base_frame: 로봇의 기본 좌표계 이름으로, 보통 base_footprint입니다.
+update_frequency: 비용지도가 업데이트되는 빈도(Hz)입니다.
+publish_frequency: 비용지도가 시각화를 위해 자신의 상태를 얼마나 자주 발행하는지를 나타냅니다.
+transform_tolerance: 프레임 간 변환이 허용되는 시간(초)입니다.
+static_map: true로 설정되면, 비용지도는 정적인 맵을 사용하게 되며, 센서로부터의 업데이트를 통해 장애물을 수정하지 않게 됩니다.
+YAML 파일 내에서 이 매개변수들이 설정되는 방식의 예시는 다음과 같습니다:
+
+yaml
+Copy code
+global_costmap:
+  global_frame: map
+  robot_base_frame: base_footprint
+  update_frequency: 10.0
+  publish_frequency: 10.0
+  transform_tolerance: 0.5
+  static_map: true
+이 구성은 글로벌 비용지도가 환경의 정적 맵과 일치하도록 설정되고, 10Hz로 상태를 업데이트 및 발행하며, 프레임 변환에 대해 0.5초의 허용 오차를 사용하도록 지시합니다.
+
+local_costmap_params.yaml 파일은 로컬 내비게이션과 장애물 회피에 사용되는 로컬 비용지도를 위한 매개변수를 설정합니다. 주요 매개변수를 요약하면 다음과 같습니다:
+
+global_frame: 로컬 비용지도가 참조하는 좌표 프레임으로, 보통 오도메트리를 위해 odom이 사용됩니다.
+robot_base_frame: 로봇 기반에 부착된 프레임으로, base_footprint입니다.
+update_frequency 및 publish_frequency: 둘 다 10.0Hz로 설정되어 로컬 비용지도가 얼마나 자주 정보를 업데이트하고 발행하는지를 정합니다.
+transform_tolerance: 변환 시간에 대해 0.5초의 지연을 허용합니다.
+static_map: 로봇의 움직임에 따라 동적으로 업데이트해야 하므로 false로 설정됩니다.
+rolling_window: true로 설정되어 로봇이 이동함에 따라 로컬 비용지도가 로봇 주변의 창을 유지하며 함께 움직입니다.
+width, height, resolution: 로컬 비용지도의 크기와 해상도를 정의합니다. 여기서는 각 셀이 5cm(0.05미터)를 나타내는 3x3미터 정사각형입니다.
+YAML 파일에서의 예시 스니펫은 다음과 같습니다:
+
+yaml
+Copy code
+local_costmap:
+  global_frame: odom
+  robot_base_frame: base_footprint
+  update_frequency: 10.0
+  publish_frequency: 10.0
+  transform_tolerance: 0.5
+  static_map: false
+  rolling_window: true
+  width: 3
+  height: 3
+  resolution: 0.05
+이 설정은 로봇이 이동함에 따라 로컬 비용지도가 지속적으로 업데이트되어 즉각적인 장애물에 반응하고 로컬 경로 계획을 돕도록 합니다.
+
+move_base_params.yaml 파일에는 경로 계획 및 내비게이션을 담당하는 move_base 노드에 대한 매개변수가 포함되어 있습니다. 주요 매개변수는 다음과 같습니다:
+
+shutdown_costmaps: false인 경우, move_base 노드가 중지될 때 비용지도가 종료되지 않습니다.
+controller_frequency: 컨트롤러가 로봇을 이동시킬 계획을 찾으려고 시도하는 빈도(Hz)입니다.
+planner_patience: 계획자가 계획을 찾기를 포기하기 전에 기다리는 시간(초)입니다.
+controller_patience: 컨트롤러가 현재 계획에 따라 로봇이 목표에 도달하기를 기다리는 시간(초)입니다.
+conservative_reset_dist: 로봇으로부터 일정 거리(미터)에서 비용지도에 장애물이 재설정됩니다.
+planner_frequency: 계획자가 새로운 계획을 시도하는 빈도(초)입니다.
+oscillation_timeout: 로봇이 진동(진전 없이 앞뒤로 움직임) 상태일 때 내비게이션을 중단하는 시간(초)입니다.
+oscillation_distance: 로봇이 진동 상태로 간주되지 않기 위해 이동해야 하는 최소 거리(미터)입니다.
+예시 스니펫:
+
+yaml
+Copy code
+shutdown_costmaps: false
+controller_frequency: 10.0
+planner_patience: 5.0
+controller_patience: 15.0
+conservative_reset_dist: 3.0
+planner_frequency: 5.0
+oscillation_timeout: 10.0
+oscillation_distance: 0.2
+이 설정들은 move_base 노드가 내비게이션 작업을 수행하는 방법과 로봇이 경로를 찾지 못하거나 갇혀 있는 상황을 처리하는 방법을 제어합니다.
+
+
+
+base_local_planner_params.yaml 파일은 로봇의 로컬 궤적 계획에 대한 매개변수를 설정합니다. 몇 가지 주요 매개변수와 설명은 다음과 같습니다:
+
+max_vel_x, min_vel_x: 로봇이 x 방향으로 이동할 수 있는 최대 및 최소 속도입니다.
+max_vel_theta, min_in_place_vel_theta: 로봇이 회전할 수 있는 최대 회전 속도입니다.
+acc_lim_x, acc_lim_theta: 로봇의 x 방향과 회전에 대한 가속도 제한입니다.
+xy_goal_tolerance, yaw_goal_tolerance: 목표 위치와 방향에 도달하기 위한 허용 오차입니다.
+holonomic_robot: 로봇이 홀로노믹(전방향 이동 가능)인지 여부를 나타냅니다 (true 또는 false).
+sim_time: 궤적을 전방 시뮬레이션하는 시간입니다.
+vx_samples, vtheta_samples: 선형 및 각속도 공간을 탐색할 때 사용하는 샘플 수입니다.
+sim_granularity: 시뮬레이션에서 샘플 간에 취하는 단계 크기입니다.
+파일에서의 예시 스니펫:
+
+yaml
+Copy code
+TrajectoryPlannerROS:
+
+# 로봇 구성 매개변수
+  max_vel_x: 0.18
+  min_vel_x: 0.08
+
+  max_vel_theta:  1.0
+  min_in_place_vel_theta: 1.0
+
+  acc_lim_x: 1.0
+  acc_lim_theta: 0.6
+
+# 목표 허용 오차 매개변수
+  xy_goal_tolerance: 0.10
+  yaw_goal_tolerance: 0.05
+
+# 차동 드라이브 로봇 구성
+  holonomic_robot: false
+
+# 전방 시뮬레이션 매개변수
+  sim_time: 0.8
+  vx_samples: 18
+  vtheta_samples: 20
+  sim_granularity: 0.05
+이 구성은 로봇의 물리적 능력과 목표에 도달하기 위해 가능한 움직임을 시뮬레이션하는 해상도를 고려하여 로봇이 궤적을 계획하는 방법을 제어합니다.
+
+
+costmap_common_params_burger.yaml 파일은 TurtleBot 3 Burger 모델의 글로벌 및 로컬 비용지도에 공통적으로 적용되는 매개변수를 설정합니다. 주요 매개변수는 다음과 같습니다:
+
+obstacle_range: 로봇에서 장애물이 비용지도에 포함되는 최대 거리입니다.
+raytrace_range: 비용지도에서 공간을 지우기 위해 광선 추적을 수행하는 거리입니다.
+footprint: 로봇의 형태와 크기를 정의하는 로봇의 발자국입니다.
+inflation_radius: 로봇이 안전한 거리를 유지하도록 보장하기 위해 장애물 주변에 비용이 추가되는 거리입니다.
+cost_scaling_factor: 로봇이 장애물에 가까워질수록 비용을 증가시키는 스케일링 요소입니다.
+map_type: 여기서 사용된 맵의 유형을 정의하며, 'costmap'이라고 지정됩니다.
+observation_sources: 비용지도를 업데이트하는 데 사용되는 관측 소스로, 일반적으로 레이저 스캐너에서 옵니다.
+파일에서의 예시 스니펫:
+
+yaml
+Copy code
+obstacle_range: 3.0
+raytrace_range: 3.5
+
+footprint: [[-0.105, -0.105], [-0.105, 0.105], [0.041, 0.105], [0.041, -0.105]]
+# robot_radius: 0.105
+
+inflation_radius: 1.0
+cost_scaling_factor: 3.0
+
+map_type: costmap
+observation_sources: scan
+scan: {sensor_frame: base_scan, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+
+
+
+dwa_local_planner_params_burger.yaml 파일은 TurtleBot 3 Burger를 위한 Dynamic Window Approach (DWA) 로컬 플래너에 대한 매개변수를 포함합니다. 중요한 매개변수는 다음과 같습니다:
+
+max_vel_x, min_vel_x: x 방향의 최대 및 최소 속도입니다.
+max_vel_trans, min_vel_trans: 이동 속도의 최대 및 최소값입니다.
+max_vel_theta, min_vel_theta: 회전 속도의 최대 및 최소값입니다.
+acc_lim_x, acc_lim_theta: x 방향의 가속도 한계와 각 가속도 한계입니다.
+xy_goal_tolerance, yaw_goal_tolerance: 목표 위치와 방향에 대한 허용 오차입니다.
+sim_time: 로봇의 궤적을 시뮬레이션하는 시간입니다.
+vx_samples, vth_samples: 선형 x 방향과 각 theta 방향의 속도 공간에서의 샘플 수입니다.
+path_distance_bias, goal_distance_bias: 궤적을 선택하기 위한 비용 함수에서 경로와 목표 거리에 대한 가중치입니다.
+oscillation_reset_dist: 진동을 재설정하는 거리입니다.
+파일에서의 예시 스니펫:
+
+yaml
+Copy code
+DWAPlannerROS:
+
+# 로봇 구성 매개변수
+  max_vel_x: 0.22
+  min_vel_x: -0.22
+  ...
+
+# 목표 허용 오차 매개변수
+  xy_goal_tolerance: 0.05
+  yaw_goal_tolerance: 0.17
+  ...
+
+# 전방 시뮬레이션 매개변수
+  sim_time: 1.5
+  vx_samples: 20
+  ...
+  vth_samples: 40
+  controller_frequency: 10.0
+
+# 궤적 점수 매기기 매개변수
+  path_distance_bias: 32.0
+  goal_distance_bias: 20.0
+  ...
+
+# 진동 방지 매개변수
+  oscillation_reset_dist: 0.05
+
+# 디버깅
+  publish_traj_pc : true
+  publish_cost_grid_pc: true
